@@ -1,5 +1,5 @@
 # elfona
-_Showing private Danish electricity consumer data on an ePaper display using an Arduino and an ePaper display._
+_ELForbrug ON Arduino" - Showing private Danish electricity consumer data on an ePaper display using an Arduino and an ePaper display._
 
 ## About the project
 Just recently, Danish electricity consumers got the possibility to acces their own private consumption (and production) data via an API-call to the web-portal eloverblik.dk. This project aims to demonstrate how these data can be accessed and viewed in an easy and meaningful way. Currently the consumption for the day before is shown, together with the average consumption (pr. day) of the month before and of the year before. 
