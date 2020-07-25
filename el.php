@@ -1,6 +1,7 @@
 <?php
 // File: el.php
-// Version: 0.1.0
+// Version: 0.2.0 2nd latest amount added (the day before yesterday)
+// Version: 0.1.0 Initial version
 // Location: https://github.com/stephanDK/elfona
 // This file is part of the elfona-project which extracts DK electricity consumer data and prepares them to be shown e.g. on an ePaper display managed by an Arduino.
 
@@ -8,6 +9,7 @@
 // Write your personal access token from eloverblik.dk below:
 $personalAccessToken = "???";
 $meterPoints = array(); // Containing all the meeters the user has (e.g. home, summer house,...)
+date_default_timezone_set("Europe/Copenhagen");
 
 
 // *** 0. *** Get the timed token
@@ -69,10 +71,29 @@ for ($i=0, $len=count($meterPoints); $i<$len; $i++)
 	$responseJson = json_decode($responseTxt); 
 
 	$periode = $responseJson->result[0]->MyEnergyData_MarketDocument->TimeSeries[0]->Period;
-	$pLatest = $periode[count($periode)-1];
-	$meterPoints[$i]["latestAmount"] = $pLatest->Point[0]->{'out_Quantity.quantity'};
-	$meterPoints[$i]["latestAmountUnit"] = $responseJson->result[0]->MyEnergyData_MarketDocument->TimeSeries[0]->{'measurement_Unit.name'};
-	$meterPoints[$i]["latestAmountDate"] = substr($pLatest->timeInterval->{'end'}, 0, 10);
+
+	if(count($periode)>1)
+	{
+		$pLatest2nd = $periode[count($periode)-2];
+		$meterPoints[$i]["latestAmount2"] = $pLatest2nd->Point[0]->{'out_Quantity.quantity'};
+	}
+	else
+	{
+		$meterPoints[$i]["latestAmount2"] = "???";
+	}
+	if(count($periode)>0)
+	{
+		$pLatest = $periode[count($periode)-1];
+		$meterPoints[$i]["latestAmount"] = $pLatest->Point[0]->{'out_Quantity.quantity'};
+		$meterPoints[$i]["latestAmountUnit"] = $responseJson->result[0]->MyEnergyData_MarketDocument->TimeSeries[0]->{'measurement_Unit.name'};
+		$meterPoints[$i]["latestAmountDate"] = substr($pLatest->timeInterval->{'end'}, 0, 10);
+	}
+	else
+	{
+		$meterPoints[$i]["latestAmount"] = "???";
+		$meterPoints[$i]["latestAmountUnit"] = "???";
+		$meterPoints[$i]["latestAmountDate"] = "no data";
+	}
 }
 
 
@@ -147,10 +168,23 @@ for ($i=0; $i<$meterCount; $i++)
 	$laDate = date('j.n.', strtotime($meterPoints[$i]["latestAmountDate"]));
 	$laMonth = date('F', strtotime("-1 month"));
 	$laYear = date('Y', strtotime("-1 year"));
+	
+	$secondLatest = "";
+	if($meterPoints[$i]["latestAmount2"] <> "???")
+	{
+		$secondLatest = floatval($meterPoints[$i]["latestAmount"]) - floatval($meterPoints[$i]["latestAmount2"]);
+		if( $secondLatest > 0)
+		{
+			$secondLatest = "+{$secondLatest}";
+		}
+	}
+	
 	echo "{$meterPoints[$i]["city"]}#";
-	echo "Latest measure ({$laDate}): {$meterPoints[$i]["latestAmount"]} kWh#";
+	echo "Latest ({$laDate}): {$meterPoints[$i]["latestAmount"]} kWh ";
+	echo "({$secondLatest})#";
 	echo "Average {$laMonth}: {$meterPoints[$i]["lastMonthPrDay"]} kWh#";
 	echo "Average {$laYear}: {$meterPoints[$i]["lastYearPrDay"]} kWh#"; 
 }
+
 //echo("</br>\r\n============</br>\r\n"); var_dump($meterPoints); echo("</br>\r\n============</br>\r\n");
 ?>
