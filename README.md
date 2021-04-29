@@ -19,6 +19,10 @@ I decided not to directly connect the Arduino to eloverblik.dk but instead to pu
 - php-site can be used by other platforms/projects
 Of course, the drawback of this decision is, that you need to have a webserver or cloud-solution, where you can upload and run the php-site from.
 
+
+![IMG_0415](https://user-images.githubusercontent.com/48651880/116550328-ec036a00-a8f6-11eb-98d1-2f45ad0b6da5.jpg)
+
+
 ## Links
 * https://eloverblik.dk/welcome
 * https://energinet.dk/El/Elmarkedet/MDA---Ny-loesning (containing a guideline for the API)
